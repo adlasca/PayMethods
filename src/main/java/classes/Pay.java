@@ -1,5 +1,5 @@
 package classes;
 
-public interface Notify {
+public interface Pay {
     public String notifying();
 }
