@@ -1,19 +1,23 @@
-package jpa;
+package com.example.metodospago.jpa;
 
+import jakarta.json.bind.annotation.JsonbTransient;
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
-@Table(name = "games", uniqueConstraints = {@UniqueConstraint(columnNames = "title")})
+@Table(name = "game", uniqueConstraints = {@UniqueConstraint(columnNames = "title")})
 public class Game {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    int id;
+    private int id;
     private String title;
     private String description;
     private double price;
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = true)
-    private User user;
+    @ManyToMany(mappedBy = "games", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JsonbTransient
+    private List<User> users;
 
     public Game() {}
     public Game(int id, String title, String description, double price) {
@@ -54,12 +58,23 @@ public class Game {
     public void setPrice(double price) {
         this.price = price;
     }
-    public User getUser() {
-        return user;
+    public List<User> getUser() {
+        return users;
+    }
+
+    public void removeUser(User user) {
+        if (users != null) {
+            users.remove(user);
+            user.getGames().remove(this);
+        }
     }
 
     public void setUser(User user) {
-        this.user = user;
+        if (users == null) {  // Protección adicional
+            users = new ArrayList<>();
+        }
+        this.users.add(user);
+       // user.getGames().add(this);
     }
 
     @Override
@@ -69,7 +84,7 @@ public class Game {
                 ", title='" + title + '\'' +
                 ", description='" + description + '\'' +
                 ", price=" + price +
-                ", user=" + user +
+                ", users=" + users +
                 '}';
     }
 }

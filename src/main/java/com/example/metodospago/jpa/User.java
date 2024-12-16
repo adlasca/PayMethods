@@ -1,12 +1,11 @@
-package jpa;
+package com.example.metodospago.jpa;
 
-import classes.CreditCard;
+import jakarta.json.bind.annotation.JsonbTransient;
 import jakarta.persistence.*;
-
 import java.util.List;
 
 @Entity
-@Table(name = "users", uniqueConstraints = {@UniqueConstraint(columnNames = "email" ),@UniqueConstraint(columnNames = "creditCards")})
+@Table(name = "users", uniqueConstraints = {@UniqueConstraint(columnNames = "email" )})
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,10 +17,14 @@ public class User {
     private String password;
     private String phone;
     private String country;
-    @OneToMany
+    @ManyToMany
+    @JoinTable(
+            name = "user_game",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "game_id")
+    )
+    @JsonbTransient
     private List<Game> games;
-    @OneToMany
-    private List<CreditCard> creditCards;
 
     public User() {}
 
@@ -102,7 +105,7 @@ public class User {
     public void setGames(List<Game> games) {
         this.games = games;
     }
-
+/*
     public List<CreditCard> getCreditCards() {
         return creditCards;
     }
@@ -113,7 +116,7 @@ public class User {
 
     public void  addCreditCard(CreditCard creditCard){
         this.creditCards.add(creditCard);
-    }
+    }*/
     public void  addGame(Game game){
         this.games.add(game);
     }

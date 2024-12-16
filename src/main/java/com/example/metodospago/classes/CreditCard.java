@@ -1,19 +1,17 @@
-package classes;
+package com.example.metodospago.classes;
 
 import jakarta.enterprise.context.RequestScoped;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jpa.User;
 
 import java.time.LocalDate;
 
 @RequestScoped
-@QualifierPayment("credit card")
-@Entity
+@QualifierPayment("creditCard")
 public class CreditCard implements Pay {
-    @Id
+
+    //La clase CreditCard contiene la mayoria de datos que requiere una tarjeta de credito real
+    //En un principio seria una entidad al igual que User y Game, conectada con User y con PayPal
+    // ya que el pago por PayPal requiere de tarjetas asociados, complicandoce mas las relaciones
+    //por lo cual decidi dejar solo la clase
     private int numberCard;
 
     private LocalDate expirationDate;
@@ -27,9 +25,7 @@ public class CreditCard implements Pay {
     private String phoneNumber;
     private String Address1;
     private String Address2;
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+
 
     public CreditCard() {}
 
@@ -51,7 +47,7 @@ public class CreditCard implements Pay {
     }
 
     @Override
-    public String paying() {
+    public String paying(double amount) {
         return "CreditCard payment successful";
     }
 

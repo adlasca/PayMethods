@@ -1,23 +1,21 @@
-package jpa;
+package com.example.metodospago.jpa;
 
-import classes.CreditCard;
-import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.PersistenceException;
+import jakarta.transaction.Transactional;
 
 import java.util.List;
 
-@ApplicationScoped
+@RequestScoped
+@Transactional(Transactional.TxType.REQUIRED)
 public class UserService {
-    @PersistenceContext(unitName = "PaymentService")
+
+    @Inject
     private EntityManager em;
 
     public UserService() {}
-    public UserService(EntityManager em) {
-        this.em = em;
-    }
 
     public void createUser(String name, String lastName,String email, String phone,String country, String password) {
         try {
@@ -28,6 +26,7 @@ public class UserService {
             user.setPhone(phone);
             user.setCountry(country);
             user.setPassword(password);
+
             em.persist(user);
         } catch (PersistenceException e) {
             throw new IllegalStateException("El email  '" + email + "' ya existe.", e);
@@ -35,12 +34,14 @@ public class UserService {
     }
 
 
-    public  void insertUserGame(String email, Game game) {
-        User user = em.find(User.class, email);
+    public  void insertUserGame(int id, Game game) {
+        User user = em.find(User.class, id);
         if(user == null) {
-            throw new IllegalArgumentException("User email " + email + " not found.");
-        }else user.addGame(game);
-        em.persist(user);
+            throw new IllegalArgumentException("User id " + id + " not found.");
+        }else {
+            user.addGame(game);
+        }
+        em.merge(user);
     }
 
     public User findUserByEmailPass(String email,String password) {
@@ -51,12 +52,23 @@ public class UserService {
                     "/pay/register/your_name,your_lastName,your_email,your_phone,your_country,your_password", e);
         }
     }
-
-    public  void  addCreditCard(String email,CreditCard creditCard) {
-        User user = em.find(User.class, email);
-        if(user == null) {
-            throw new IllegalArgumentException("User email " + email + " not found.");
-        }else user.addCreditCard(creditCard);
-        em.persist(user);
+    public List<User> listAllUsers() {
+        return em.createQuery("SELECT  e from  User e",User.class).getResultList();
     }
+
+    public User findUserById(int id) {
+        return em.find(User.class, id);
+    }
+
+    public void deleteUser(int id) {
+        User user = findUserById(id);
+        em.remove(user);
+    }
+
+    public void updateUser(User user) {
+        //em.getTransaction().begin();
+        em.merge(user);
+        //em.getTransaction().commit();
+    }
+
 }

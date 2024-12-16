@@ -1,4 +1,4 @@
-package classes;
+package com.example.metodospago.classes;
 
 import jakarta.inject.Qualifier;
 

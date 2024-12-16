@@ -1,4 +1,4 @@
-package jpa;
+package com.example.metodospago.jpa;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
